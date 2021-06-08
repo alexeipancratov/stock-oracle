@@ -7,25 +7,29 @@ contract StockQuote {
         uint volume;
     }
     
-    mapping(bytes4 => Stock) stockQuotes;
-    address oracleOwner;
+    mapping(bytes4 => Stock) _stockQuotes;
+    address _oracleOwner;
 
     constructor() {
-        oracleOwner = msg.sender;
+        _oracleOwner = msg.sender;
+    }
+
+    function oracleOwner() public view returns(address) {
+        return _oracleOwner;
     }
 
     function setStock(bytes4 symbol, uint price, uint volume) public {
-        require(msg.sender == oracleOwner, "Only Oracle owner can set stock quote");
+        require(msg.sender == _oracleOwner, "Only Oracle owner can set stock quote");
         
         Stock memory stock = Stock(price, volume);
-        stockQuotes[symbol] = stock;
+        _stockQuotes[symbol] = stock;
     }
 
     function getStockPrice(bytes4 symbol) public view returns (uint) {
-        return stockQuotes[symbol].price;
+        return _stockQuotes[symbol].price;
     }
 
     function getStockVolume(bytes4 symbol) public view returns (uint) {
-        return stockQuotes[symbol].volume; 
+        return _stockQuotes[symbol].volume; 
     }
 }

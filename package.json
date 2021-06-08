@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "concurrently": "^6.2.0"
+  },
+  "author": "Alexei Pancratov",
+  "scripts": {
+    "start": "concurrently \"cd back-end && node app\" \" cd ui && npm start\""
+  }
+}
