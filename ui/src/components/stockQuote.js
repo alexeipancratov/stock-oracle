@@ -5,6 +5,7 @@ import {
   STOCK_ORACLE_ABI,
   STOCK_ORACLE_ADDRESS,
 } from "../contractAbis/stockQuote";
+import "./stockQuote.css";
 
 const BLOCKCHAIN_NETWORK_URL = "http://localhost:8545";
 const REST_API = "http://localhost:3001";
@@ -25,10 +26,10 @@ export default function StockQuote() {
         const response = await axios(
           `${REST_API}/getStockQuote/${stockSymbol}`
         );
-        
+
         await setStockData(response.data["Global Quote"]);
       } catch (error) {
-        console.log('Some error while retrieving data');
+        console.log("Some error while retrieving data");
         console.error(error);
       }
     };
@@ -48,7 +49,7 @@ export default function StockQuote() {
     );
     stockQuoteInstance.methods
       .setStock(web3.utils.fromAscii(stockSymbol), price, volume)
-      .send({from: accounts[0]})
+      .send({ from: accounts[0] })
       .on("receipt", (receipt) => {
         alert(`Success!\nTransaction hash: ${receipt.transactionHash}`);
       });
@@ -61,36 +62,69 @@ export default function StockQuote() {
       STOCK_ORACLE_ABI,
       STOCK_ORACLE_ADDRESS
     );
-    const stockPrice = await stockQuoteInstance.methods.getStockPrice(web3.utils.fromAscii(stockSymbol)).call();
-    const stockVolume = await stockQuoteInstance.methods.getStockVolume(web3.utils.fromAscii(stockSymbol)).call();
+    const stockPrice = await stockQuoteInstance.methods
+      .getStockPrice(web3.utils.fromAscii(stockSymbol))
+      .call();
+    const stockVolume = await stockQuoteInstance.methods
+      .getStockVolume(web3.utils.fromAscii(stockSymbol))
+      .call();
 
     setStockQuote({
       price: stockPrice,
-      volume: stockVolume
+      volume: stockVolume,
     });
   };
 
   return (
     <>
       <form onSubmit={onSubmit}>
-        <label htmlFor="stockSymbol">Stock symbol</label>
-        <input
-          id="stockSymbol"
-          placeholder="Stock symbol, e.g. 'MSFT'"
-          value={stockSymbol}
-          onChange={onStockSymbolChange}
-        />
-
-        <button type="submit">Look Up</button>
-      </form>
-      <section>
-        <button type="button" onClick={onViewStockQuoteClick}>View Stock Quote</button>
-        {stockQuote && (
-          <div>
-            <p><em>Price: </em>{parseFloat(stockQuote.price / 1000).toFixed(4)}</p>
-            <p><em>Volume: </em>{stockQuote.volume}</p>
+        <div className="md-3 row mt-5">
+          <label className="col-sm-1 offset-sm-2" htmlFor="stockSymbol">
+            Stock symbol
+          </label>
+          <div className="col-sm-5">
+            <input
+              id="stockSymbol"
+              className="form-control"
+              placeholder="Stock symbol, e.g. 'MSFT'"
+              value={stockSymbol}
+              onChange={onStockSymbolChange}
+            />
           </div>
-        )}
+          <div className="col-sm-3">
+            <button className="btn btn-primary" type="submit">
+              Look Up
+            </button>
+          </div>
+        </div>
+      </form>
+      <section id="stockQuote" className="row mt-3">
+        <div className="col-sm-3 offset-sm-4">
+          <div className="card">
+            <div className="card-body">
+              <h5 class="card-title">Stock quote</h5>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onViewStockQuoteClick}
+              >
+                View Stock Quote
+              </button>
+              {stockQuote && (
+                <>
+                  <p className="card-text mt-1">
+                    <em>Price: </em>
+                    {parseFloat(stockQuote.price / 1000).toFixed(4)}
+                  </p>
+                  <p className="card-text">
+                    <em>Volume: </em>
+                    {stockQuote.volume}
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       </section>
     </>
   );
