@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import axios from "axios";
 import {
@@ -13,6 +13,21 @@ const REST_API = "http://localhost:3001";
 export default function StockQuote() {
   const [stockSymbol, setStockSymbol] = useState("");
   const [stockQuote, setStockQuote] = useState(null);
+  const [web3, setWeb3] = useState();
+  const [contractInstance, setContractInstance] = useState();
+
+  useEffect(() => {
+    setWeb3(new Web3(BLOCKCHAIN_NETWORK_URL));
+  }, []);
+
+  useEffect(() => {
+    if (web3) {
+      setContractInstance(new web3.eth.Contract(
+        STOCK_ORACLE_ABI,
+        STOCK_ORACLE_ADDRESS
+      ));
+    }
+  }, [web3]);
 
   const onStockSymbolChange = (e) => {
     setStockSymbol(e.target.value);
@@ -40,14 +55,9 @@ export default function StockQuote() {
     const price = parseFloat(quoteData["05. price"]) * 1000;
     const volume = parseInt(quoteData["06. volume"]);
 
-    const web3 = new Web3(BLOCKCHAIN_NETWORK_URL);
     const accounts = await web3.eth.getAccounts();
 
-    const stockQuoteInstance = new web3.eth.Contract(
-      STOCK_ORACLE_ABI,
-      STOCK_ORACLE_ADDRESS
-    );
-    stockQuoteInstance.methods
+    contractInstance.methods
       .setStock(web3.utils.fromAscii(stockSymbol), price, volume)
       .send({ from: accounts[0] })
       .on("receipt", (receipt) => {
@@ -56,16 +66,10 @@ export default function StockQuote() {
   };
 
   const onViewStockQuoteClick = async () => {
-    const web3 = new Web3(BLOCKCHAIN_NETWORK_URL);
-
-    const stockQuoteInstance = new web3.eth.Contract(
-      STOCK_ORACLE_ABI,
-      STOCK_ORACLE_ADDRESS
-    );
-    const stockPrice = await stockQuoteInstance.methods
+    const stockPrice = await contractInstance.methods
       .getStockPrice(web3.utils.fromAscii(stockSymbol))
       .call();
-    const stockVolume = await stockQuoteInstance.methods
+    const stockVolume = await contractInstance.methods
       .getStockVolume(web3.utils.fromAscii(stockSymbol))
       .call();
 
@@ -102,7 +106,7 @@ export default function StockQuote() {
         <div className="col-sm-3 offset-sm-4">
           <div className="card">
             <div className="card-body">
-              <h5 class="card-title">Stock quote</h5>
+              <h5 className="card-title">Stock quote</h5>
               <button
                 type="button"
                 className="btn btn-primary"
