@@ -1,13 +1,19 @@
 # Stock Oracle
-This is a demo of a simple Oracle for the smart contract. Oracle is represented as a back-end API which retrieves data from trusted 3-rd party source.
+This is a demo of a simple Oracle for the smart contract. Oracle is represented as Node.js API + React Web UI. Web UI provides funtionality to request and set stock data in the StockQuote smart contract. Node.js API retrieves this data from a trusted 3-rd party source.
 
 ## Components
 
 ### Node.js API
-Represents the Oracle which provides data to the smart contract.
+Represents the back-end part of the Oracle which provides data to the smart contract.
 
 ### React Web UI
+Represents the UI part of the Oracle which allows to request data from API and set it in the smart contract.
 ![image](https://user-images.githubusercontent.com/3188163/121762484-e24c6380-cb3e-11eb-9c8f-85809591030c.png)
+
+Additionally it provides capability to view stock quote data on the web page.
+
+### Smart Contract
+The StockQuote smart contract is used to store and retrieve data about stocks. Setting data is assumed to happen from the Oracle side.
 
 ## Development notes
 
